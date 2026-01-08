@@ -1,42 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Verifikasi Rekapan Arisan</title>
-</head>
-<body>
-
-<h3>VERIFIKASI REKAPAN ARISAN</h3>
-<div id="hasil">Memeriksa...</div>
-<div id="pdf"></div>
-
 <script>
 const api = "https://script.google.com/macros/s/AKfycbwEe6gOzbHw9GoVH2LBrDeF8XNrv027vg6cgk7ez3jpeRxsVsnyJaWaAp6sw-S9XqD6ig/exec";
-const id = new URLSearchParams(location.search).get("id");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-fetch(api + "?id=" + id)
-.then(r => r.json())
-.then(d => {
-  if (d.status === "valid") {
-    document.getElementById("hasil").innerHTML = `
-      <b>REKAPAN SAH</b><br>
-      Periode: ${data.periode}<br>
-      Kelompok: ${data.kelompok}<br>
-      Total: ${data.total}<br>
-      Tanggal Sah: ${data.tanggal}
-    `;
+const hasil = document.getElementById("hasil");
+const pdf = document.getElementById("pdf");
 
-    document.getElementById("pdf").innerHTML = `
-      <iframe
-        src="https://drive.google.com/file/d/${d.fileId}/preview"
-        width="100%" height="600">
-      </iframe>
-    `;
-  } else {
-    document.getElementById("hasil").innerText = "DATA TIDAK SAH";
-  }
-});
+if (!id) {
+  hasil.innerText = "ID TIDAK DITEMUKAN";
+} else {
+  fetch(api + "?id=" + encodeURIComponent(id))
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === "valid") {
+        hasil.innerHTML = `
+          <b>REKAPAN SAH</b><br>
+          Periode: ${d.periode}<br>
+          Kelompok: ${d.kelompok}<br>
+          Total: ${d.total}<br>
+          Tanggal Sah: ${d.tanggal}
+        `;
+
+        pdf.innerHTML = `
+          <iframe
+            src="https://drive.google.com/file/d/${d.fileId}/preview?rm=minimal"
+            width="100%" height="600"
+            sandbox="allow-scripts allow-same-origin">
+          </iframe>
+        `;
+      } else if (d.status === "dicabut") {
+        hasil.innerText = "REKAPAN TELAH DICABUT";
+      } else {
+        hasil.innerText = "DATA TIDAK SAH";
+      }
+    })
+    .catch(err => {
+      hasil.innerText = "GAGAL MENGHUBUNGI SERVER";
+      console.error(err);
+    });
+}
 </script>
-
-</body>
-</html>
