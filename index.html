@@ -30,8 +30,21 @@ if (!id) {
           Periode: ${d.periode}<br>
           Kelompok: ${d.kelompok}<br>
           Dana Sehat: ${d.total}<br>
-          Dana Arisan: ${d.tanggal}
-        `;
+          Dana Arisan: ${d.tanggal}<br>
+          
+          <hr>
+
+            <p><b>Dibuat oleh:</b><br>${data.pelaksana_arisan}, Pelaksana Arisan RT 007/06</p>
+            
+            <p><b>Diketahui oleh:</b><br>Darmanto, Pengelola Dana Sehat RT 007/06</p>
+
+            <p><b>Disahkan oleh:</b><br>Abdul Kadir, Ketua RT 007/06</p>
+
+            <div class="footer">
+              Surat ini telah diverifikasi melalui sistem digital RT 007/06.
+              <p><i>This system was created by anang</i>
+            </div>
+          `;
 
         pdf.innerHTML = `
           <iframe
