@@ -5,6 +5,7 @@
 <title>Verifikasi Rekapan Arisan</title>
 
 <style>
+/* ===== WATERMARK HEADER ===== */
 .watermark-top {
   position: fixed;
   top: 10px;
@@ -16,11 +17,48 @@
   z-index: 9999;
   user-select: none;
 }
+
+/* ===== BLOK SELEKSI ===== */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ===== WATERMARK PDF ===== */
+.pdf-wrapper {
+  position: relative;
+}
+
+.pdf-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0,0,0,0.04),
+    rgba(0,0,0,0.04) 20px,
+    transparent 20px,
+    transparent 40px
+  );
+}
+
+.pdf-watermark span {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 11px;
+  color: rgba(0,0,0,0.5);
+  font-family: Arial, sans-serif;
+}
 </style>
 
 </head>
 <body>
 
+<!-- ===== WATERMARK HEADER (KODE LAMA, TIDAK DIUBAH) ===== -->
 <div class="watermark-top">
   <i>This system was created by A</i>
 </div>
@@ -30,6 +68,9 @@
 <div id="pdf"></div>
 
 <script>
+/* =====================================================
+   KONFIGURASI API (KODE LAMA, TIDAK DIUBAH)
+===================================================== */
 const api = "https://script.google.com/macros/s/AKfycbw2jel0gBVQdECoFY-SexA3TDZ-HXtKqr2tMSZkgyeb2SG7j8l6g9NdIsKSjlt7ithVJg/exec";
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
@@ -53,25 +94,34 @@ if (!id) {
           
           <hr>
 
-            <b>Dibuat oleh:</b> Anang, Pelaksana Arisan RT 007/06<br>
-            <b>Ditinjau oleh:</b> Darmanto, Pengelola Dana Sehat RT 007/06<br>
-            <b>Disahkan oleh:</b> Abdul Kadir, Ketua RT 007/06<br>
+          <b>Dibuat oleh:</b> Anang, Pelaksana Arisan RT 007/06<br>
+          <b>Ditinjau oleh:</b> Darmanto, Pengelola Dana Sehat RT 007/06<br>
+          <b>Disahkan oleh:</b> Abdul Kadir, Ketua RT 007/06<br>
 
-            <div class="footer">
-              <i>Rekapan ini telah melalui verifikasi sistem digital RT 007/06</i>
+          <div class="footer">
+            <i>Rekapan ini telah melalui verifikasi sistem digital RT 007/06</i>
           </div>
-          `;
-
-        pdf.innerHTML = `
-          <iframe
-            src="https://drive.google.com/file/d/${d.fileId}/preview?rm=minimal"
-            width="100%" height="600"
-            sandbox="allow-scripts allow-same-origin">
-          </iframe>
         `;
-      } else if (d.status === "dicabut") {
+
+        /* ===== PDF DENGAN PROTEKSI ===== */
+        pdf.innerHTML = `
+          <div class="pdf-wrapper">
+            <div class="pdf-watermark">
+              <span>Verified RT 007/06 • ID: ${id}</span>
+            </div>
+            <iframe
+              src="https://drive.google.com/file/d/${d.fileId}/preview?rm=minimal&embedded=true"
+              width="100%"
+              height="600"
+              sandbox="allow-scripts allow-same-origin">
+            </iframe>
+          </div>
+        `;
+      } 
+      else if (d.status === "revoked") {
         hasil.innerText = "REKAPAN TELAH DICABUT";
-      } else {
+      } 
+      else {
         hasil.innerText = "DATA TIDAK SAH";
       }
     })
@@ -80,4 +130,31 @@ if (!id) {
       console.error(err);
     });
 }
+
+/* =====================================================
+   PROTEKSI COPY / DOWNLOAD / PRINT (TAMBAHAN)
+===================================================== */
+
+// Blok klik kanan
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// Blok copy
+document.addEventListener("copy", e => e.preventDefault());
+
+// Blok seleksi teks
+document.addEventListener("selectstart", e => e.preventDefault());
+
+// Blok shortcut umum
+document.addEventListener("keydown", function(e) {
+  const key = e.key.toLowerCase();
+  if (
+    (e.ctrlKey && ["c", "s", "p", "u"].includes(key)) ||
+    key === "printscreen"
+  ) {
+    e.preventDefault();
+  }
+});
 </script>
+
+</body>
+</html>
